@@ -6,6 +6,8 @@ export type ScoreBreakdown = {
   penalties: number;
 };
 
+export const PASS_THRESHOLD = 70;
+
 export function scoreUserStory(storyRaw: string): { score: number; breakdown: ScoreBreakdown; feedback: string[] } {
   const story = storyRaw.trim();
   const feedback: string[] = [];
@@ -66,14 +68,72 @@ export function scoreUserStory(storyRaw: string): { score: number; breakdown: Sc
   };
 }
 
-export const BAD_STORY = `As a user I want the app to be better and faster etc.
-It should do many things and be nice.
-`;
+export type StoryCategory = 'General' | 'UI' | 'Frontend' | 'API' | 'Backend';
 
-export const REFERENCE_STORY = `As a registered shopper, I want to save items to a wishlist so that I can purchase them later without searching again.
+export const STORIES: Record<StoryCategory, { bad: string; reference: string }> = {
+  General: {
+    bad: `As a user I want the system to be better and easy etc so that things are improved.
+It should do many things and be nice.
+`,
+    reference: `As a project member, I want to receive a daily digest email summarizing my assigned tasks so that I can plan my day efficiently.
 
 Acceptance Criteria:
-Given I am on a product page and I am logged in,
-When I click the "Add to wishlist" button,
-Then the item appears in my wishlist and the wishlist icon shows the updated count.
-`; 
+Given I have at least one open task,
+When the daily digest is generated at 8am local time,
+Then I receive an email listing my tasks grouped by due date and priority.
+`
+  },
+  UI: {
+    bad: `As a user I want the screens to look nice and modern etc so that it's better.
+It should be fast and beautiful and have animations and stuff.
+`,
+    reference: `As a shopper, I want the product detail page to display images in a responsive gallery so that I can clearly view products on any screen size.
+
+Acceptance Criteria:
+Given I open a product detail page on a mobile device,
+When I swipe the image carousel,
+Then the next image appears smoothly and the thumbnails update to reflect the current image.
+`
+  },
+  Frontend: {
+    bad: `As a user I want the app to load quickly and just work with less bugs etc.
+It should be reactive and nice and use the latest frameworks.
+`,
+    reference: `As a returning user, I want client-side caching for my dashboard data so that the page loads instantly on revisits within 5 minutes.
+
+Acceptance Criteria:
+Given I have already loaded my dashboard within the last 5 minutes,
+When I navigate back to the dashboard,
+Then the dashboard data is served from cache and refreshed in the background without blocking the UI.
+`
+  },
+  API: {
+    bad: `As an admin I want an API that does everything quickly so data is synced and stuff.
+It should be secure and powerful.
+`,
+    reference: `As an admin, I want an authenticated POST /v1/users/{id}/roles endpoint so that I can assign or revoke roles without database access.
+
+Acceptance Criteria:
+Given I have a valid admin token,
+When I POST to /v1/users/123/roles with body { add: ['editor'], remove: ['viewer'] },
+Then the response is 200 with the updated roles list and the change is recorded in audit logs.
+`
+  },
+  Backend: {
+    bad: `As a system I want the backend to be scalable and super fast and microservices etc.
+It should handle many things.
+`,
+    reference: `As a platform operator, I want order processing to be handled asynchronously via a queue so that peak traffic does not slow down checkout.
+
+Acceptance Criteria:
+Given an order is submitted,
+When the order service enqueues a job for payment and inventory,
+Then a worker processes the job within 30 seconds and order status transitions are persisted atomically.
+`
+  }
+};
+
+export const DEFAULT_CATEGORY: StoryCategory = 'Frontend';
+
+export const BAD_STORY = STORIES[DEFAULT_CATEGORY].bad;
+export const REFERENCE_STORY = STORIES[DEFAULT_CATEGORY].reference; 
